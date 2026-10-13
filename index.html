@@ -85,21 +85,21 @@ svg text{font-family:Inter,system-ui,sans-serif;fill:#465268;font-size:12px}
         <div class="helper" id="valueHelper">Enter the measured value in mm.</div>
       </div>
       <button id="calcBtn">Calculate percentile</button>
-      <p class="small" id="ageBandsNote">Age bands follow your BIOMAP scheme: monthly groups for 0–3 months, 3-month groups from 3 to 36 months, then yearly groups from 3 to 18 years.</p>
+      <p class="small" id="ageBandsNote">Calculations use exact age as a continuous variable. Enter age in years or months (0–18 years).</p>
     </div>
 
     <div class="card">
       <h2>Result</h2>
       <div class="result-grid">
         <div class="stat"><div class="k">Metric</div><div class="v" id="outMetric">AP pons diameter</div></div>
-        <div class="stat"><div class="k">Age band</div><div class="v" id="outGroup">6–7y</div></div>
+        <div class="stat"><div class="k">Age</div><div class="v" id="outGroup">6.5 years</div></div>
         <div class="stat"><div class="k">Estimated percentile</div><div class="v" id="outPct">50.00</div></div>
         <div class="stat"><div class="k">Reference median</div><div class="v" id="outMedian">21.12 mm</div></div>
         <div class="stat"><div class="k">Expected range</div><div class="v" id="outRange">18.78–23.47 mm</div></div>
       </div>
       <div id="outClass"></div>
       <div class="note" id="outText">
-        The measured AP pons diameter is <strong>21.12 mm</strong>, corresponding to the <strong>50.00th percentile</strong> for <strong>male</strong> healthy subjects in the <strong>6–7y</strong> age band.
+        The measured AP pons diameter is <strong>21.12 mm</strong>, corresponding to the <strong>49.86th percentile</strong> for <strong>male</strong> subjects aged <strong>6.5 years</strong> in the BIOMAP-PCF reference population.
       </div>
 
       <div id="chartWrap"><svg id="chart" width="760" height="420" viewBox="0 0 760 420"></svg></div>
@@ -119,8 +119,8 @@ svg text{font-family:Inter,system-ui,sans-serif;fill:#465268;font-size:12px}
 <script>
 const SITE_TEXT = {
   title: "BIOMAP percentile calculator - Posterior Cranial Fossa MRI measures in children",
-  subtitle: `Percentile calculator based on the normative data published in <strong>BLINDED FOR PEER REVIEW</strong> for all 11 MRI metrics, stratified by <strong>sex</strong> and <strong>age group</strong>.`,
-  ageBandsNote: "Age groups are defined as follows: monthly groups for 0–3 months, 3-month groups from 3 to 36 months, then yearly groups from 3 to 18 years.",
+  subtitle: `Percentile calculator based on the BIOMAP-PCF age- and sex-specific reference curves for 11 posterior cranial fossa MRI measurements, according to data published in BLINDED FOR PEER REVIEW.`,
+  ageBandsNote: "Calculations use exact age as a continuous variable. Enter age in years or months (0–18 years).",
   footer: "Percentiles are calculated directly from the sex-specific continuous Royston–Wright models, with Normal, EN and MEN distributions as appropriate."
 };
 
@@ -240,13 +240,13 @@ function render() {
   const [clText, clClass] = classify(pct);
   const sexText = sex === 'M' ? 'male' : 'female';
   document.getElementById('outMetric').textContent = metric.label;
-  document.getElementById('outGroup').textContent = band.label;
+  document.getElementById('outGroup').textContent = `${fmt(age)} ${ageUnit}`;
   document.getElementById('outPct').textContent = fmt(pct);
   document.getElementById('outMedian').textContent = `${fmt(modelQuantile(metricId,sex,months,0))} ${metric.unit}`;
   document.getElementById('outRange').textContent = `${fmt(modelQuantile(metricId,sex,months,-Z97))}–${fmt(modelQuantile(metricId,sex,months,Z97))} ${metric.unit}`;
   document.getElementById('outClass').innerHTML = `<span class="badge ${clClass}">${clText}</span>`;
   document.getElementById('outText').innerHTML =
-    `The measured <strong>${metric.label}</strong> is <strong>${fmt(value)} ${metric.unit}</strong>, corresponding to the <strong>${fmt(pct)}th percentile</strong> for <strong>${sexText}</strong> healthy subjects in the <strong>${band.label}</strong> age band.`;
+    `The measured <strong>${metric.label}</strong> is <strong>${fmt(value)} ${metric.unit}</strong>, corresponding to the <strong>${fmt(pct)}th percentile</strong> for <strong>${sexText}</strong> subjects aged <strong>${fmt(age)} ${ageUnit}</strong> in the BIOMAP-PCF reference population.`;
 
   drawChart(metric, sex, months, value);
 }
